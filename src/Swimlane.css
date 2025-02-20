@@ -2,6 +2,12 @@
   text-align: left;
   font-weight: bold;
   font-size: 18px;
+  color: #333;
+  padding: 10px 0;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .Swimlane-dragColumn {
