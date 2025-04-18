@@ -21,6 +21,62 @@ export default class Board extends React.Component {
       complete: React.createRef(),
     }
   }
+  
+  componentDidMount() {
+    // Initialize dragula
+    const drake = Dragula([
+      this.swimlanes.backlog.current,
+      this.swimlanes.inProgress.current,
+      this.swimlanes.complete.current
+    ]);
+    
+    // Update state when a card is dropped
+    drake.on('drop', (el, target, source) => {
+      const cardId = el.getAttribute('data-id');
+      const newStatus = target.getAttribute('data-status');
+      
+      // Update the client's status in state
+      this.setState(prevState => {
+        const updatedClients = { ...prevState.clients };
+        
+        // Find which lane the card was in
+        let sourceLane = 'backlog';
+        if (source === this.swimlanes.inProgress.current) {
+          sourceLane = 'inProgress';
+        } else if (source === this.swimlanes.complete.current) {
+          sourceLane = 'complete';
+        }
+        
+        // Find which lane the card is now in
+        let targetLane = 'backlog';
+        if (target === this.swimlanes.inProgress.current) {
+          targetLane = 'inProgress';
+        } else if (target === this.swimlanes.complete.current) {
+          targetLane = 'complete';
+        }
+        
+        // Move the card from source lane to target lane
+        const cardIndex = updatedClients[sourceLane].findIndex(client => client.id === cardId);
+        if (cardIndex !== -1) {
+          const card = { ...updatedClients[sourceLane][cardIndex] };
+          card.status = newStatus;
+          
+          // Remove from source lane
+          updatedClients[sourceLane] = updatedClients[sourceLane].filter(client => client.id !== cardId);
+          
+          // Add to target lane
+          updatedClients[targetLane] = [...updatedClients[targetLane], card];
+        }
+        
+        return { clients: updatedClients };
+      });
+    });
+  }
+  
+  componentWillUnmount() {
+    // Clean up dragula instance if needed
+  }
+  
   getClients() {
     return [
       ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],

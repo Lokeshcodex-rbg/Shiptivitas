@@ -15,10 +15,23 @@ export default class Swimlane extends React.Component {
         />
       );
     })
+    
+    // Determine the status based on the swimlane name
+    let status = 'backlog';
+    if (this.props.name === 'In Progress') {
+      status = 'in-progress';
+    } else if (this.props.name === 'Complete') {
+      status = 'complete';
+    }
+    
     return (
       <div className="Swimlane-column">
         <div className="Swimlane-title">{this.props.name}</div>
-        <div className="Swimlane-dragColumn" ref={this.props.dragulaRef}>
+        <div 
+          className="Swimlane-dragColumn" 
+          ref={this.props.dragulaRef}
+          data-status={status}
+        >
           {cards}
         </div>
       </div>);
