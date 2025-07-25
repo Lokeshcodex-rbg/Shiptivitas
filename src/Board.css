@@ -1,3 +1,28 @@
-.Board {
-  margin-top: 12px;
+.client-card {
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: move;
+}
+
+.backlog {
+  background-color: #777;
+}
+
+.in-progress {
+  background-color: #3498db;
+}
+
+.complete {
+  background-color: #2ecc71;
+}
+
+.Swimlane-column {
+  min-height: 300px;
+  background: #f8f8f8;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem;
 }

@@ -14,14 +14,21 @@ export default class Swimlane extends React.Component {
           status={client.status}
         />
       );
-    })
+    });
+
     return (
       <div className="Swimlane-column">
         <div className="Swimlane-title">{this.props.name}</div>
-        <div className="Swimlane-dragColumn" ref={this.props.dragulaRef}>
+
+        {/* 🔥 KEY CHANGE: Add data-lane for Dragula logic */}
+        <div
+          className="Swimlane-dragColumn"
+          ref={this.props.dragulaRef}
+          data-lane={this.props.laneKey} // "backlog", "in-progress", "complete"
+        >
           {cards}
         </div>
-      </div>);
+      </div>
+    );
   }
-
 }
