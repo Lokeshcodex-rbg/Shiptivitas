@@ -1,0 +1,23 @@
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.Swimlane-column {
+  background: #fafafa;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 320px;
+}
+.lane { min-height: 260px; }
+.card {
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+  background: white;
+}
+.card.backlog { background: #e0e0e0; }   /* grau  */
+.card.progress { background: #bcd6ff; }  /* blau  */
+.card.done { background: #c7f5d9; }      /* grün  */
