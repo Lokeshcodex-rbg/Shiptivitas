@@ -1,5 +1,5 @@
 import React from 'react';
-import Dragula from 'dragula';
+import dragula from 'dragula';
 import 'dragula/dist/dragula.css';
 import Swimlane from './Swimlane';
 import './Board.css';
@@ -10,49 +10,121 @@ export default class Board extends React.Component {
     const clients = this.getClients();
     this.state = {
       clients: {
-        backlog: clients.filter(client => !client.status || client.status === 'backlog'),
-        inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
-        complete: clients.filter(client => client.status && client.status === 'complete'),
+        backlog: clients,
+        'in-progress': [],
+        complete: [],
       }
     }
     this.swimlanes = {
       backlog: React.createRef(),
-      inProgress: React.createRef(),
+      'in-progress': React.createRef(),
       complete: React.createRef(),
     }
+    this.drake = null;
   }
   getClients() {
     return [
-      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
-      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'complete'],
-      ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
-      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'in-progress'],
-      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'in-progress'],
-      ['6','Boehm and Sons','Automated Systematic Paradigm', 'backlog'],
-      ['7','Runolfsson, Hegmann and Block','Integrated Transitional Strategy', 'backlog'],
-      ['8','Schumm-Labadie','Operative Heuristic Challenge', 'backlog'],
-      ['9','Kohler Group','Re-Contextualized Multi-Tasking Attitude', 'backlog'],
-      ['10','Romaguera Inc','Managed Foreground Toolset', 'backlog'],
-      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'complete'],
-      ['12','Emard, Champlin and Runolfsdottir','Devolved Needs-Based Capability', 'backlog'],
-      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'complete'],
-      ['14','Borer LLC','Profit-Focused Incremental Orchestration', 'backlog'],
-      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'in-progress'],
-      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'in-progress'],
-      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'complete'],
-      ['18','Bins, Toy and Klocko','Integrated Assymetric Software', 'backlog'],
-      ['19','Hodkiewicz-Hayes','Programmable Systematic Securedline', 'backlog'],
-      ['20','Murphy, Lang and Ferry','Organized Explicit Access', 'backlog'],
-    ].map(companyDetails => ({
-      id: companyDetails[0],
-      name: companyDetails[1],
-      description: companyDetails[2],
-      status: companyDetails[3],
-    }));
+      {id: '1', name: 'Stark, White and Abbott', description: 'Cloned Optimal Architecture', status: 'backlog'},
+      {id: '2', name: 'Wiza LLC', description: 'Exclusive Bandwidth-Monitored Implementation', status: 'backlog'},
+      {id: '3', name: 'Nolan LLC', description: 'Vision-Oriented 4Thgeneration Graphicaluserinterface', status: 'backlog'},
+      {id: '4', name: 'Thompson PLC', description: 'Streamlined Regional Knowledgeuser', status: 'backlog'},
+      {id: '5', name: 'Walker-Williamson', description: 'Team-Oriented 6Thgeneration Matrix', status: 'backlog'},
+      {id: '6', name: 'Boehm and Sons', description: 'Automated Systematic Paradigm', status: 'backlog'},
+      {id: '7', name: 'Runolfsson, Hegmann and Block', description: 'Integrated Transitional Strategy', status: 'backlog'},
+      {id: '8', name: 'Schumm-Labadie', description: 'Operative Heuristic Challenge', status: 'backlog'},
+      {id: '9', name: 'Kohler Group', description: 'Re-Contextualized Multi-Tasking Attitude', status: 'backlog'},
+      {id: '10', name: 'Romaguera Inc', description: 'Managed Foreground Toolset', status: 'backlog'},
+      {id: '11', name: 'Reilly-King', description: 'Future-Proofed Interactive Toolset', status: 'backlog'},
+      {id: '12', name: 'Emard, Champlin and Runolfsdottir', description: 'Devolved Needs-Based Capability', status: 'backlog'},
+      {id: '13', name: 'Fritsch, Cronin and Wolff', description: 'Open-Source 3Rdgeneration Website', status: 'backlog'},
+      {id: '14', name: 'Borer LLC', description: 'Profit-Focused Incremental Orchestration', status: 'backlog'},
+      {id: '15', name: 'Emmerich-Ankunding', description: 'User-Centric Stable Extranet', status: 'backlog'},
+      {id: '16', name: 'Willms-Abbott', description: 'Progressive Bandwidth-Monitored Access', status: 'backlog'},
+      {id: '17', name: 'Brekke PLC', description: 'Intuitive User-Facing Customerloyalty', status: 'backlog'},
+      {id: '18', name: 'Bins, Toy and Klocko', description: 'Integrated Assymetric Software', status: 'backlog'},
+      {id: '19', name: 'Hodkiewicz-Hayes', description: 'Programmable Systematic Securedline', status: 'backlog'},
+      {id: '20', name: 'Murphy, Lang and Ferry', description: 'Organized Explicit Access', status: 'backlog'},
+    ];
+  }
+  componentDidMount() {
+    const containers = [
+      this.swimlanes.backlog.current,
+      this.swimlanes['in-progress'].current,
+      this.swimlanes.complete.current,
+    ].filter(Boolean);
+
+    this.drake = dragula(containers, {
+      copy: false,
+      moves: function (el, source) {
+        return true;
+      },
+    });
+    this.drake.on('drop', (el, target, source, sibling) => {
+      if (!target) return;
+      const newStatus = target.getAttribute('data-status');
+      if (!newStatus) return;
+      const cardId = el.getAttribute('data-id');
+      if (source !== target) {
+        source.appendChild(el);
+      }
+      setTimeout(() => {
+        this.updateCardStatus(cardId, newStatus, sibling);
+      }, 0);
+    });
+  }
+  updateCardStatus(cardId, newStatus, sibling) {
+    this.setState(prevState => {
+      const oldStatus = Object.keys(prevState.clients).find(status => 
+        prevState.clients[status].some(c => c.id === cardId)
+      );
+      if (!oldStatus) return prevState;
+      let targetList = [...prevState.clients[newStatus]];
+      let oldList = null;
+      let card;
+      if (oldStatus !== newStatus) {
+        oldList = [...prevState.clients[oldStatus]];
+        const cardIndex = oldList.findIndex(c => c.id === cardId);
+        if (cardIndex !== -1) {
+          card = { ...oldList[cardIndex], status: newStatus };
+          oldList.splice(cardIndex, 1);
+        } else {
+          return prevState;
+        }
+      } else {
+        const cardIndex = targetList.findIndex(c => c.id === cardId);
+        if (cardIndex !== -1) {
+          card = { ...targetList[cardIndex], status: newStatus };
+          targetList.splice(cardIndex, 1);
+        } else {
+          return prevState;
+        }
+      }
+      let insertIndex = targetList.length;
+      if (sibling) {
+        const siblingId = sibling.getAttribute('data-id');
+        if (siblingId) {
+          insertIndex = targetList.findIndex(c => c.id === siblingId);
+          if (insertIndex === -1) {
+            insertIndex = targetList.length;
+          }
+        }
+      }
+      targetList.splice(insertIndex, 0, card);
+      const newClients = { ...prevState.clients };
+      newClients[newStatus] = targetList;
+      if (oldStatus !== newStatus && oldList) {
+        newClients[oldStatus] = oldList;
+      }
+      return { clients: newClients };
+    });
   }
   renderSwimlane(name, clients, ref) {
+    let statusKey;
+    if (name === 'Backlog') statusKey = 'backlog';
+    else if (name === 'In-Progress') statusKey = 'in-progress';
+    else if (name === 'Complete') statusKey = 'complete';
     return (
-      <Swimlane name={name} clients={clients} dragulaRef={ref}/>
+      <Swimlane name={name} clients={clients} dragulaRef={ref} statusKey={statusKey} />
     );
   }
 
@@ -65,7 +137,7 @@ export default class Board extends React.Component {
               {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
             </div>
             <div className="col-md-4">
-              {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
+              {this.renderSwimlane('In-Progress', this.state.clients['in-progress'], this.swimlanes['in-progress'])}
             </div>
             <div className="col-md-4">
               {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
@@ -74,5 +146,15 @@ export default class Board extends React.Component {
         </div>
       </div>
     );
+  }
+
+ componentWillUnmount() {
+    if (this.drake) {
+      try {
+        this.drake.destroy();
+      } catch (error) {
+        console.error('Error destroying dragula:', error);
+      }
+    }
   }
 }
