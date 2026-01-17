@@ -1,12 +1,72 @@
+.Swimlane-column {
+	background: rgba(45, 55, 72, 0.95);
+	border-radius: 16px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	overflow: hidden;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Swimlane-column:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
+}
+
 .Swimlane-title {
-  text-align: left;
-  font-weight: bold;
-  font-size: 18px;
+	text-align: left;
+	font-weight: 700;
+	font-size: 16px;
+	padding: 16px 20px;
+	background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	color: #e2e8f0;
+	letter-spacing: 0.5px;
+	text-transform: uppercase;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.Swimlane-title::before {
+	content: '';
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #718096;
+}
+
+.Swimlane-column:nth-child(1) .Swimlane-title::before {
+	background: linear-gradient(135deg, #718096, #a0aec0);
+}
+
+.Swimlane-column:nth-child(2) .Swimlane-title::before {
+	background: linear-gradient(135deg, #3182ce, #63b3ed);
+}
+
+.Swimlane-column:nth-child(3) .Swimlane-title::before {
+	background: linear-gradient(135deg, #38a169, #68d391);
 }
 
 .Swimlane-dragColumn {
-  height: calc(100vh - 100px);
-  overflow-y: auto;
-  background-color: #f5f5f5;
-  padding: 16px 8px;
+	height: calc(100vh - 180px);
+	overflow-y: auto;
+	background: linear-gradient(180deg, #1a202c 0%, #171923 100%);
+	padding: 16px;
+	min-height: 300px;
+}
+
+.Swimlane-dragColumn::-webkit-scrollbar {
+	width: 6px;
+}
+
+.Swimlane-dragColumn::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.Swimlane-dragColumn::-webkit-scrollbar-thumb {
+	background: rgba(255, 255, 255, 0.15);
+	border-radius: 3px;
+}
+
+.Swimlane-dragColumn::-webkit-scrollbar-thumb:hover {
+	background: rgba(255, 255, 255, 0.25);
 }

@@ -1,215 +1,316 @@
-diff --git a/src/Board.js b/src/Board.js
-index 1f00045..161cfd7 100644
---- a/src/Board.js
-+++ b/src/Board.js
-@@ -5,74 +5,141 @@ import Swimlane from './Swimlane';
- import './Board.css';
- 
- export default class Board extends React.Component {
--  constructor(props) {
--    super(props);
--    const clients = this.getClients();
--    this.state = {
--      clients: {
--        backlog: clients.filter(client => !client.status || client.status === 'backlog'),
--        inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
--        complete: clients.filter(client => client.status && client.status === 'complete'),
--      }
--    }
--    this.swimlanes = {
--      backlog: React.createRef(),
--      inProgress: React.createRef(),
--      complete: React.createRef(),
--    }
--  }
--  getClients() {
--    return [
--      ['1','Stark, White and Abbott','Cloned Optimal Architecture', 'in-progress'],
--      ['2','Wiza LLC','Exclusive Bandwidth-Monitored Implementation', 'complete'],
--      ['3','Nolan LLC','Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
--      ['4','Thompson PLC','Streamlined Regional Knowledgeuser', 'in-progress'],
--      ['5','Walker-Williamson','Team-Oriented 6Thgeneration Matrix', 'in-progress'],
--      ['6','Boehm and Sons','Automated Systematic Paradigm', 'backlog'],
--      ['7','Runolfsson, Hegmann and Block','Integrated Transitional Strategy', 'backlog'],
--      ['8','Schumm-Labadie','Operative Heuristic Challenge', 'backlog'],
--      ['9','Kohler Group','Re-Contextualized Multi-Tasking Attitude', 'backlog'],
--      ['10','Romaguera Inc','Managed Foreground Toolset', 'backlog'],
--      ['11','Reilly-King','Future-Proofed Interactive Toolset', 'complete'],
--      ['12','Emard, Champlin and Runolfsdottir','Devolved Needs-Based Capability', 'backlog'],
--      ['13','Fritsch, Cronin and Wolff','Open-Source 3Rdgeneration Website', 'complete'],
--      ['14','Borer LLC','Profit-Focused Incremental Orchestration', 'backlog'],
--      ['15','Emmerich-Ankunding','User-Centric Stable Extranet', 'in-progress'],
--      ['16','Willms-Abbott','Progressive Bandwidth-Monitored Access', 'in-progress'],
--      ['17','Brekke PLC','Intuitive User-Facing Customerloyalty', 'complete'],
--      ['18','Bins, Toy and Klocko','Integrated Assymetric Software', 'backlog'],
--      ['19','Hodkiewicz-Hayes','Programmable Systematic Securedline', 'backlog'],
--      ['20','Murphy, Lang and Ferry','Organized Explicit Access', 'backlog'],
--    ].map(companyDetails => ({
--      id: companyDetails[0],
--      name: companyDetails[1],
--      description: companyDetails[2],
--      status: companyDetails[3],
--    }));
--  }
--  renderSwimlane(name, clients, ref) {
--    return (
--      <Swimlane name={name} clients={clients} dragulaRef={ref}/>
--    );
--  }
-+	constructor(props) {
-+		super(props);
-+		const clients = this.getClients();
-+		this.state = {
-+			clients: {
-+				backlog: clients.filter(client => !client.status || client.status === 'backlog'),
-+				inProgress: clients.filter(client => client.status && client.status === 'in-progress'),
-+				complete: clients.filter(client => client.status && client.status === 'complete'),
-+			}
-+		}
-+		this.swimlanes = {
-+			backlog: React.createRef(),
-+			inProgress: React.createRef(),
-+			complete: React.createRef(),
-+		}
+diff --git a/src/Board.css b/src/Board.css
+index 792e356..fee8725 100644
+--- a/src/Board.css
++++ b/src/Board.css
+@@ -1,3 +1,57 @@
+ .Board {
+-  margin-top: 12px;
++	margin-top: 12px;
++	padding: 0 12px;
++	min-height: calc(100vh - 80px);
++	background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
++	animation: gradientShift 10s ease infinite;
++	background-size: 200% 200%;
+ }
++
++@keyframes gradientShift {
++	0% {
++		background-position: 0% 50%;
 +	}
-+	componentDidMount() {
-+		const drake = Dragula([
-+			this.swimlanes.backlog.current,
-+			this.swimlanes.inProgress.current,
-+			this.swimlanes.complete.current
-+		]);
++
++	50% {
++		background-position: 100% 50%;
++	}
++
++	100% {
++		background-position: 0% 50%;
++	}
++}
++
++.Board .row {
++	display: flex;
++	gap: 16px;
++	padding: 20px 0;
++}
++
++.Board .col-md-4 {
++	flex: 1;
++	animation: slideUp 0.5s ease-out;
++}
++
++.Board .col-md-4:nth-child(1) {
++	animation-delay: 0.1s;
++}
++
++.Board .col-md-4:nth-child(2) {
++	animation-delay: 0.2s;
++}
++
++.Board .col-md-4:nth-child(3) {
++	animation-delay: 0.3s;
++}
++
++@keyframes slideUp {
++	from {
++		opacity: 0;
++		transform: translateY(30px);
++	}
++
++	to {
++		opacity: 1;
++		transform: translateY(0);
++	}
++}
+\ No newline at end of file
+diff --git a/src/Card.css b/src/Card.css
+index 6fec4e4..5080747 100644
+--- a/src/Card.css
++++ b/src/Card.css
+@@ -1,25 +1,109 @@
+ .Card {
+-  background-color: lightgrey;
+-  font-size: 12px;
+-  padding: 20px;
+-  margin-bottom: 10px;
++	background: #2d3748;
++	font-size: 13px;
++	padding: 16px 18px;
++	margin-bottom: 12px;
++	border-radius: 10px;
++	cursor: grab;
++	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
++	border-left: 4px solid transparent;
++	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
++	position: relative;
++	overflow: hidden;
++}
++
++.Card::after {
++	content: '';
++	position: absolute;
++	top: 0;
++	left: 0;
++	right: 0;
++	bottom: 0;
++	background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
++	opacity: 0;
++	transition: opacity 0.3s ease;
++}
++
++.Card:hover {
++	transform: translateY(-3px) scale(1.02);
++	box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
++}
++
++.Card:hover::after {
++	opacity: 1;
++}
++
++.Card:active {
++	cursor: grabbing;
++	transform: scale(1.05) rotate(2deg);
++	box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
++	z-index: 100;
+ }
  
+ .Card-grey {
+-  background-color: rgba(167, 158, 158, 0.671);
+-  color: black;
++	background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
++	border-left-color: #718096;
++	color: #a0aec0;
++}
++
++.Card-grey:hover {
++	border-left-color: #a0aec0;
+ }
+ 
+ .Card-blue {
+-  background-color: skyblue;
+-  color: white;
++	background: linear-gradient(135deg, #1a365d 0%, #2a4365 100%);
++	border-left-color: #3182ce;
++	color: #90cdf4;
++}
++
++.Card-blue:hover {
++	border-left-color: #63b3ed;
++	background: linear-gradient(135deg, #2a4365 0%, #2c5282 100%);
+ }
+ 
+ .Card-green {
+-  background-color: rgb(150, 190, 150);
+-  color: white;
++	background: linear-gradient(135deg, #1c4532 0%, #22543d 100%);
++	border-left-color: #38a169;
++	color: #9ae6b4;
++}
++
++.Card-green:hover {
++	border-left-color: #68d391;
++	background: linear-gradient(135deg, #22543d 0%, #276749 100%);
+ }
+ 
+ .Card-title {
+-  font-weight: bold;
++	font-weight: 600;
++	font-size: 14px;
++	line-height: 1.4;
++	margin-bottom: 4px;
++}
++
++.Card-description {
++	font-size: 12px;
++	opacity: 0.7;
++	line-height: 1.5;
++}
++
++.gu-mirror {
++	position: fixed !important;
++	margin: 0 !important;
++	z-index: 9999 !important;
++	opacity: 0.9;
++	transform: rotate(3deg);
++	box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5) !important;
++	border-radius: 10px;
+ }
++
++.gu-transit {
++	opacity: 0.3;
++	transform: scale(0.95);
++}
++
++.gu-hide {
++	display: none !important;
++}
++
++.gu-unselectable {
++	user-select: none !important;
++}
+\ No newline at end of file
+diff --git a/src/Card.js b/src/Card.js
+index a8ad663..8600932 100644
+--- a/src/Card.js
++++ b/src/Card.js
+@@ -2,19 +2,20 @@ import React from 'react';
+ import './Card.css';
+ 
+ export default class Card extends React.Component {
 -  render() {
+-    let className = ['Card'];
+-    if (this.props.status === 'backlog') {
+-      className.push('Card-grey');
+-    } else if (this.props.status === 'in-progress') {
+-      className.push('Card-blue');
+-    } else if (this.props.status === 'complete') {
+-      className.push('Card-green');
+-    }
 -    return (
--      <div className="Board">
--        <div className="container-fluid">
--          <div className="row">
--            <div className="col-md-4">
--              {this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
--            </div>
--            <div className="col-md-4">
--              {this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
--            </div>
--            <div className="col-md-4">
--              {this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
--            </div>
--          </div>
--        </div>
+-      <div className={className.join(' ')} data-id={this.props.id} data-status={this.props.status}>
+-        <div className="Card-title">{this.props.name}</div>
 -      </div>
 -    );
 -  }
-+		drake.on('drop', (el, target, source, sibling) => {
-+			const cardId = el.getAttribute('data-id');
-+			let newStatus = 'backlog';
-+
-+			if (target === this.swimlanes.inProgress.current) {
-+				newStatus = 'in-progress';
-+			} else if (target === this.swimlanes.complete.current) {
-+				newStatus = 'complete';
-+			}
-+
-+			const siblingId = sibling ? sibling.getAttribute('data-id') : null;
-+
-+			let sourceStatus = 'backlog';
-+			if (source === this.swimlanes.inProgress.current) {
-+				sourceStatus = 'in-progress';
-+			} else if (source === this.swimlanes.complete.current) {
-+				sourceStatus = 'complete';
-+			}
-+
-+			drake.cancel(true);
-+
-+			const allClients = [
-+				...this.state.clients.backlog,
-+				...this.state.clients.inProgress,
-+				...this.state.clients.complete
-+			];
-+
-+			const draggedClient = allClients.find(client => client.id === cardId);
-+			if (!draggedClient) return;
-+
-+			const updatedClient = { ...draggedClient, status: newStatus };
-+
-+			const buildNewList = (clients, status) => {
-+				let list = clients.filter(client => client.id !== cardId);
-+
-+				if (status === newStatus) {
-+					if (siblingId) {
-+						const siblingIndex = list.findIndex(client => client.id === siblingId);
-+						if (siblingIndex !== -1) {
-+							list.splice(siblingIndex, 0, updatedClient);
-+						} else {
-+							list.push(updatedClient);
-+						}
-+					} else {
-+						list.push(updatedClient);
-+					}
-+				}
-+
-+				return list;
-+			};
-+
-+			this.setState({
-+				clients: {
-+					backlog: buildNewList(this.state.clients.backlog, 'backlog'),
-+					inProgress: buildNewList(this.state.clients.inProgress, 'in-progress'),
-+					complete: buildNewList(this.state.clients.complete, 'complete'),
-+				}
-+			});
-+		});
-+	}
-+	getClients() {
-+		return [
-+			['1', 'Stark, White and Abbott', 'Cloned Optimal Architecture', 'in-progress'],
-+			['2', 'Wiza LLC', 'Exclusive Bandwidth-Monitored Implementation', 'complete'],
-+			['3', 'Nolan LLC', 'Vision-Oriented 4Thgeneration Graphicaluserinterface', 'backlog'],
-+			['4', 'Thompson PLC', 'Streamlined Regional Knowledgeuser', 'in-progress'],
-+			['5', 'Walker-Williamson', 'Team-Oriented 6Thgeneration Matrix', 'in-progress'],
-+			['6', 'Boehm and Sons', 'Automated Systematic Paradigm', 'backlog'],
-+			['7', 'Runolfsson, Hegmann and Block', 'Integrated Transitional Strategy', 'backlog'],
-+			['8', 'Schumm-Labadie', 'Operative Heuristic Challenge', 'backlog'],
-+			['9', 'Kohler Group', 'Re-Contextualized Multi-Tasking Attitude', 'backlog'],
-+			['10', 'Romaguera Inc', 'Managed Foreground Toolset', 'backlog'],
-+			['11', 'Reilly-King', 'Future-Proofed Interactive Toolset', 'complete'],
-+			['12', 'Emard, Champlin and Runolfsdottir', 'Devolved Needs-Based Capability', 'backlog'],
-+			['13', 'Fritsch, Cronin and Wolff', 'Open-Source 3Rdgeneration Website', 'complete'],
-+			['14', 'Borer LLC', 'Profit-Focused Incremental Orchestration', 'backlog'],
-+			['15', 'Emmerich-Ankunding', 'User-Centric Stable Extranet', 'in-progress'],
-+			['16', 'Willms-Abbott', 'Progressive Bandwidth-Monitored Access', 'in-progress'],
-+			['17', 'Brekke PLC', 'Intuitive User-Facing Customerloyalty', 'complete'],
-+			['18', 'Bins, Toy and Klocko', 'Integrated Assymetric Software', 'backlog'],
-+			['19', 'Hodkiewicz-Hayes', 'Programmable Systematic Securedline', 'backlog'],
-+			['20', 'Murphy, Lang and Ferry', 'Organized Explicit Access', 'backlog'],
-+		].map(companyDetails => ({
-+			id: companyDetails[0],
-+			name: companyDetails[1],
-+			description: companyDetails[2],
-+			status: companyDetails[3],
-+		}));
-+	}
-+	renderSwimlane(name, clients, ref) {
-+		return (
-+			<Swimlane name={name} clients={clients} dragulaRef={ref} />
-+		);
-+	}
-+
 +	render() {
++		let className = ['Card'];
++		if (this.props.status === 'backlog') {
++			className.push('Card-grey');
++		} else if (this.props.status === 'in-progress') {
++			className.push('Card-blue');
++		} else if (this.props.status === 'complete') {
++			className.push('Card-green');
++		}
 +		return (
-+			<div className="Board">
-+				<div className="container-fluid">
-+					<div className="row">
-+						<div className="col-md-4">
-+							{this.renderSwimlane('Backlog', this.state.clients.backlog, this.swimlanes.backlog)}
-+						</div>
-+						<div className="col-md-4">
-+							{this.renderSwimlane('In Progress', this.state.clients.inProgress, this.swimlanes.inProgress)}
-+						</div>
-+						<div className="col-md-4">
-+							{this.renderSwimlane('Complete', this.state.clients.complete, this.swimlanes.complete)}
-+						</div>
-+					</div>
-+				</div>
++			<div className={className.join(' ')} data-id={this.props.id} data-status={this.props.status}>
++				<div className="Card-title">{this.props.name}</div>
++				<div className="Card-description">{this.props.description}</div>
 +			</div>
 +		);
 +	}
  }
+\ No newline at end of file
+diff --git a/src/Swimlane.css b/src/Swimlane.css
+index 2cb5f86..e0c837b 100644
+--- a/src/Swimlane.css
++++ b/src/Swimlane.css
+@@ -1,12 +1,72 @@
++.Swimlane-column {
++	background: rgba(45, 55, 72, 0.95);
++	border-radius: 16px;
++	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
++	overflow: hidden;
++	transition: transform 0.3s ease, box-shadow 0.3s ease;
++}
++
++.Swimlane-column:hover {
++	transform: translateY(-4px);
++	box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4);
++}
++
+ .Swimlane-title {
+-  text-align: left;
+-  font-weight: bold;
+-  font-size: 18px;
++	text-align: left;
++	font-weight: 700;
++	font-size: 16px;
++	padding: 16px 20px;
++	background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
++	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
++	color: #e2e8f0;
++	letter-spacing: 0.5px;
++	text-transform: uppercase;
++	display: flex;
++	align-items: center;
++	gap: 10px;
++}
++
++.Swimlane-title::before {
++	content: '';
++	width: 10px;
++	height: 10px;
++	border-radius: 50%;
++	background: #718096;
++}
++
++.Swimlane-column:nth-child(1) .Swimlane-title::before {
++	background: linear-gradient(135deg, #718096, #a0aec0);
++}
++
++.Swimlane-column:nth-child(2) .Swimlane-title::before {
++	background: linear-gradient(135deg, #3182ce, #63b3ed);
++}
++
++.Swimlane-column:nth-child(3) .Swimlane-title::before {
++	background: linear-gradient(135deg, #38a169, #68d391);
+ }
+ 
+ .Swimlane-dragColumn {
+-  height: calc(100vh - 100px);
+-  overflow-y: auto;
+-  background-color: #f5f5f5;
+-  padding: 16px 8px;
++	height: calc(100vh - 180px);
++	overflow-y: auto;
++	background: linear-gradient(180deg, #1a202c 0%, #171923 100%);
++	padding: 16px;
++	min-height: 300px;
+ }
++
++.Swimlane-dragColumn::-webkit-scrollbar {
++	width: 6px;
++}
++
++.Swimlane-dragColumn::-webkit-scrollbar-track {
++	background: transparent;
++}
++
++.Swimlane-dragColumn::-webkit-scrollbar-thumb {
++	background: rgba(255, 255, 255, 0.15);
++	border-radius: 3px;
++}
++
++.Swimlane-dragColumn::-webkit-scrollbar-thumb:hover {
++	background: rgba(255, 255, 255, 0.25);
++}
+\ No newline at end of file
